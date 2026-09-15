@@ -1,0 +1,30 @@
+# Environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Data & models (large, downloaded)
+data/
+models/
+checkpoints/
+runs/
+outputs/
+wandb/
+
+# Kaggle / HF caches
+.cache/
+*.bz2
+submission.json
+inference_outputs/
+
+# Secrets
+.kaggle/
+kaggle.json
+.env
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

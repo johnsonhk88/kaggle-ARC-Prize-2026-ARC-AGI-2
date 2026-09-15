@@ -1,0 +1,44 @@
+# ARC Prize 2026 - ARC-AGI-2 environment
+# Local: RTX PRO 4500 Blackwell (sm_120) -> needs CUDA 12.8 PyTorch wheels.
+#
+# Install:
+#   python3 -m venv .venv
+#   .venv/bin/pip install --upgrade pip
+#   .venv/bin/pip install -r requirements.txt
+#
+# Optional (attempt separately, may fail on Blackwell):
+#   .venv/bin/pip install unsloth
+#
+# For fast 7GB model downloads:
+#   HF_HUB_ENABLE_HF_TRANSFER=1 .venv/bin/hf download <repo>
+
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# --- Core deep learning (GPU) ---
+torch==2.11.0
+numpy
+safetensors
+einops
+
+# --- Hugging Face training stack ---
+transformers>=4.57
+peft>=0.17
+trl>=0.24
+datasets
+accelerate
+bitsandbytes
+sentencepiece
+protobuf
+huggingface_hub[hf_transfer]
+
+# --- Notebooks & analysis ---
+jupyterlab
+ipykernel
+matplotlib
+pandas
+tqdm
+pillow
+
+# --- Kaggle tooling (data/model download, notebook submission prep) ---
+kaggle
+kagglehub

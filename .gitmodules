@@ -1,0 +1,3 @@
+[submodule "dataset/NVARC"]
+	path = dataset/NVARC
+	url = https://github.com/1ytic/NVARC.git
