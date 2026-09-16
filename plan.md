@@ -97,6 +97,7 @@ Defects to fix in the hardened notebook:
 | D3 | Port NVARC's 16-token vocab approach to new models (lossless row selection; validate in a spike; stock-tokenizer + constrained decoding as fallback) | Resolved (validate in P3) |
 | D4 | Download NVARC ready-made datasets (augmented + synthetic puzzles) and use them as the primary training data, with competition/ARC-GEN/RE-ARC data as license-clean supplements | Resolved |
 | D5 | Baseline first, then fine-tuning | Resolved |
+| D6 | Runnable code lives in a **single Jupyter notebook**: `src/notebooks/arc2_ttt_dfs_solver.ipynb` (Kaggle/Colab/local). The standalone `src/arc/*.py` modules and the `src/tools/build_notebook.py` generator were removed after consolidation (2026-09-17) | Resolved |
 
 ## 5. Phases & Tasks
 
@@ -107,15 +108,17 @@ Use `[ ]` / `[x]` and append a dated note when a task completes.
   - [x] 2026-09-16: `.venv` created; `torch==2.11.0+cu128` installed and verified (CUDA available, sm_120 in arch list).
   - [x] 2026-09-16: `requirements.txt` written at repo root; remaining installs delegated to the user.
 - [ ] P0.2 **User action:** create Kaggle API token -> save as `~/.kaggle/kaggle.json` (or run `kaggle login`), and accept the competition rules on the Kaggle website.
-- [ ] P0.3 Download competition data -> `data/competition/`.
+- [~] P0.3 Download competition data -> `data/competition/`.
+  - [x] 2026-09-16: public ARC-AGI-2 repo cloned to `data/ARC-AGI-2` (1000 train + 120 eval, Apache-2.0) and combined Kaggle-style files built to `data/combined/` (unblocks local work without Kaggle auth). Kaggle competition download still optional.
 - [ ] P0.4 Download `sorokin/nvarc-augmented-puzzles` (11.97GB) and `sorokin/nvarc-synthetic-puzzles` (5.79GB) -> `data/nvarc/`.
-- [ ] P0.5 Download the model: HF mirror (7.27GB) -> `models/qwen3_4b_grids15_sft139/`, or Kaggle model via kagglehub.
-- [ ] P0.6 Add `.gitignore` for `data/`, `models/`, `runs/`, `.venv/`, caches.
-- [ ] P0.7 GPU smoke test: load the 16-token model, run one decoding step; verify sm_120 compatibility and measure VRAM.
+- [x] P0.5 Download the model: HF mirror (7.27GB) -> `models/qwen3_4b_grids15_sft139/` (both shards verified byte-identical to HF).
+- [x] P0.6 Add `.gitignore` for `data/`, `models/`, `runs/`, `.venv/`, caches.
+- [x] P0.7 GPU smoke test: model loads in 1.2s (3.63B params, 7.27GB VRAM); the custom tokenizer MUST be `PreTrainedTokenizerFast(tokenizer_file=tokenizer.json)` (`AutoTokenizer` loads a wrong variant that drops `user`/`assistant`); 2-step LoRA TTT trained successfully.
 
 ### Phase 1 - Local harness + study
-- [ ] P1.1 Extract the notebook modules (`arc_loader`, `arc_decoder`, `arc_solver`) into importable `src/arc/` with the defect fixes.
-- [ ] P1.2 Local smoke test on the 4 hardcoded eval tasks; expect ~2.5-3.0/4; record per-task TTT/decode times.
+- [x] P1.1 Extract the notebook modules and fixes into a single self-contained notebook `src/notebooks/arc2_ttt_dfs_solver.ipynb` (data build, model fetch, TTT, DFS decode, ranking, submission, validation). Standalone `.py` modules removed per D6.
+- [~] P1.2 Local smoke test; expect ~2.5-3.0/4 on the 4 hardcoded eval tasks; record per-task TTT/decode times.
+  - 2026-09-17: dry-run of the notebook passes with 0 errors. Background 1-task run (`0934a4d8`, `ARC_GRAD_CKPT=1`) completed end-to-end: 13 candidate files + `submission.json`; validation **0/1** (correct grid absent from candidates; local plain-transformers path differs from the Unsloth path → directional only). User runs remaining task validation.
 - [ ] P1.3 Write `docs/arc-prize-2026-study.md` (inference pipeline; fine-tuning new models; data/dataset guide) with source links.
 - [ ] P1.4 Update `README.md` with repo structure and quick start.
 
@@ -179,3 +182,5 @@ Use `[ ]` / `[x]` and append a dated note when a task completes.
 | 2026-09-16 | - | Plan approved and written. Research complete: model lineage, notebooks, datasets, fine-tuning stack. |
 | 2026-09-16 | P0 | venv + torch 2.11.0+cu128 verified (sm_120 OK). `requirements.txt` written; user installs remaining deps. |
 | 2026-09-16 | P0.5 | HF mirror of the baseline model downloading in background -> `models/qwen3_4b_grids15_sft139/` (log: `download.log`). |
+| 2026-09-17 | P0 | Model verified complete. Tokenizer gotcha found + fixed (fast tokenizer from `tokenizer.json`). venv stack installed. |
+| 2026-09-17 | P1 | Single-notebook architecture (D6): `src/notebooks/arc2_ttt_dfs_solver.ipynb`; dry-run passes with 0 errors; 1-task background run completed (TTT+DFS+submission). Standalone `.py` modules removed. |
